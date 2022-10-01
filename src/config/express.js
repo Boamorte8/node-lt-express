@@ -1,16 +1,24 @@
-import express from 'express';
+import express, { json, text } from 'express';
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
+import cookieParser from 'cookie-parser';
 
 import productRouter from '#Routes/product.routes.js';
 import userRouter from '#Routes/user.routes.js';
 
 const expressApp = express();
 
-expressApp.use(express.json());
+expressApp.use(cookieParser());
+expressApp.use(text());
+expressApp.use(json());
 
 const customDirname = dirname(fileURLToPath(import.meta.url));
 expressApp.use(express.static(join(customDirname, '../public')));
+
+expressApp.use((req, res, next) => {
+  console.log('Middleware to app level');
+  next();
+});
 
 // The character ? do the before character optional or you can use a regex instead of a string
 // expressApp.get('/users?', (_, res) => res.send('Hello users'));

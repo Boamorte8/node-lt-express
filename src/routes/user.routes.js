@@ -2,6 +2,11 @@ import { Router } from 'express';
 
 const userRouter = Router();
 
+userRouter.use((req, res, next) => {
+  console.log('Middleware to user Router level');
+  next();
+});
+
 userRouter.get('/:id', (req, res) => {
   // res can be:
   // sendFile: to send a file to the frontend
