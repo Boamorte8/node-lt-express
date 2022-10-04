@@ -13,7 +13,7 @@ expressApp.use(text());
 expressApp.use(json());
 
 const customDirname = dirname(fileURLToPath(import.meta.url));
-expressApp.use(express.static(join(customDirname, '../public')));
+expressApp.use('/public', express.static(join(customDirname, '../../public')));
 
 expressApp.use((req, res, next) => {
   console.log('Middleware to app level');
@@ -27,6 +27,17 @@ expressApp.use((req, res, next) => {
 // );
 expressApp.use('/products', productRouter);
 expressApp.use('/users', userRouter);
+
+expressApp.use((err, req, res, next) => {
+  console.log(err.message);
+  next(err);
+});
+
+expressApp.use((err, req, res, next) => {
+  return res
+    .status(404)
+    .send({ errors: [err.message || 'Endpoint not found'] });
+});
 
 expressApp.use((_, res, next) => {
   res.status(404).send({ errors: ['Endpoint not found'] });
