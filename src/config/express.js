@@ -1,10 +1,33 @@
+import cookieParser from 'cookie-parser';
 import express, { json, text } from 'express';
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
-import cookieParser from 'cookie-parser';
+import { pinoHttp } from 'pino-http';
+import uuid from 'uuid-random';
 
 import productRouter from '#Routes/product.routes.js';
 import userRouter from '#Routes/user.routes.js';
+
+const httpLogger = pinoHttp({
+  genReqId: () => uuid(),
+  customLogLevel: (req, res) => {
+    if (res.statusCode < 400) return 'info';
+    return 'error';
+  },
+  transport: {
+    pipeline: [
+      {
+        target: 'pino-pretty',
+        options: {
+          levelFirst: true,
+          minimumLevel: 'error',
+          destination: 1,
+          translateTime: 'yyyy-mm-dd HH:MM:ss.1 o',
+        },
+      },
+    ],
+  },
+});
 
 const expressApp = express();
 
@@ -21,7 +44,12 @@ expressApp.use(text());
 expressApp.use(json());
 
 expressApp.use((req, res, next) => {
-  console.log('Middleware to app level');
+  // console.log('Middleware to app level');
+  // One option it's implement a logger here
+  // myLogger(req)
+  // Libraries that help you with logging are: winston, morgan, and pino
+  // pino-http is an implementation of pino focused on http logging
+  httpLogger(req, res);
   next();
 });
 
@@ -42,7 +70,10 @@ expressApp.use('/products', productRouter);
 expressApp.use('/users', userRouter);
 
 expressApp.use((err, req, res, next) => {
-  console.log(err.message);
+  res.err = {
+    message: err.message,
+    stack: err.stack,
+  };
   next(err);
 });
 
