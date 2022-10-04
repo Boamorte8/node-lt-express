@@ -8,18 +8,31 @@ import userRouter from '#Routes/user.routes.js';
 
 const expressApp = express();
 
+// Express configuration
+const customDirname = dirname(fileURLToPath(import.meta.url));
+expressApp.use('/public', express.static(join(customDirname, '../../public')));
+
+expressApp.set('view engine', 'ejs');
+expressApp.set('views', join(customDirname, '../../views'));
+
+// Application middlewares
 expressApp.use(cookieParser());
 expressApp.use(text());
 expressApp.use(json());
-
-const customDirname = dirname(fileURLToPath(import.meta.url));
-expressApp.use('/public', express.static(join(customDirname, '../../public')));
 
 expressApp.use((req, res, next) => {
   console.log('Middleware to app level');
   next();
 });
 
+// Template
+expressApp.get('/index/:name', (req, res) => {
+  return res.render('index.ejs', {
+    name: req.params.name,
+  });
+});
+
+// Routers
 // The character ? do the before character optional or you can use a regex instead of a string
 // expressApp.get('/users?', (_, res) => res.send('Hello users'));
 // expressApp.get('/user/:userId', (req, res) =>
