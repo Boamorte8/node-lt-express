@@ -5,6 +5,7 @@
     "baseUrl": "./",
     "paths": {
       "#Config/*": ["./src/config/*"],
+      "#Controllers/*": ["./src/controllers/*"],
       "#Lib/*": ["./src/lib/*"],
       "#Routes/*": ["./src/routes/*"]
     }

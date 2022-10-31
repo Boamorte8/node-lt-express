@@ -5,6 +5,7 @@ import { join, dirname } from 'path';
 import { pinoHttp } from 'pino-http';
 import uuid from 'uuid-random';
 
+import feedRouter from '#Routes/feed.routes.js';
 import productRouter from '#Routes/product.routes.js';
 import userRouter from '#Routes/user.routes.js';
 
@@ -53,6 +54,17 @@ expressApp.use((req, res, next) => {
   next();
 });
 
+// To handle CORS requests errors
+expressApp.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET, POST, DELETE, PUT; PATCH, OPTIONS'
+  );
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
+
 // Template
 expressApp.get('/index/:name', (req, res) => {
   return res.render('index.ejs', {
@@ -68,6 +80,7 @@ expressApp.get('/index/:name', (req, res) => {
 // );
 expressApp.use('/products', productRouter);
 expressApp.use('/users', userRouter);
+expressApp.use('/feed', feedRouter);
 
 expressApp.use((err, req, res, next) => {
   res.err = {

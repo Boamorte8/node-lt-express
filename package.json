@@ -25,7 +25,7 @@
     "eslint-config-prettier": "8.5.0",
     "eslint-config-standard": "17.0.0",
     "eslint-plugin-import": "2.26.0",
-    "eslint-plugin-n": "15.3.0",
+    "eslint-plugin-n": "15.4.0",
     "eslint-plugin-promise": "6.1.1",
     "husky": "8.0.1",
     "lint-staged": "13.0.3",
@@ -34,6 +34,7 @@
   },
   "imports": {
     "#Config/*": "./src/config/*",
+    "#Controllers/*": "./src/controllers/*",
     "#Lib/*": "./src/lib/*",
     "#Routes/*": "./src/routes/*"
   },
