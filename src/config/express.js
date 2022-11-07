@@ -1,34 +1,12 @@
 import cookieParser from 'cookie-parser';
-import express, { json, text } from 'express';
+import express, { json } from 'express';
+import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { join, dirname } from 'path';
-import { pinoHttp } from 'pino-http';
-import uuid from 'uuid-random';
 
 import feedRouter from '#Routes/feed.routes.js';
 import productRouter from '#Routes/product.routes.js';
 import userRouter from '#Routes/user.routes.js';
-
-const httpLogger = pinoHttp({
-  genReqId: () => uuid(),
-  customLogLevel: (req, res) => {
-    if (res.statusCode < 400) return 'info';
-    return 'error';
-  },
-  transport: {
-    pipeline: [
-      {
-        target: 'pino-pretty',
-        options: {
-          levelFirst: true,
-          minimumLevel: 'error',
-          destination: 1,
-          translateTime: 'yyyy-mm-dd HH:MM:ss.1 o',
-        },
-      },
-    ],
-  },
-});
+import httpLogger from './logger.js';
 
 const expressApp = express();
 
@@ -41,7 +19,7 @@ expressApp.set('views', join(customDirname, '../../views'));
 
 // Application middlewares
 expressApp.use(cookieParser());
-expressApp.use(text());
+// expressApp.use(text());
 expressApp.use(json());
 
 expressApp.use((req, res, next) => {
@@ -82,6 +60,7 @@ expressApp.use('/products', productRouter);
 expressApp.use('/users', userRouter);
 expressApp.use('/feed', feedRouter);
 
+// Error middleware
 expressApp.use((err, req, res, next) => {
   res.err = {
     message: err.message,
@@ -94,10 +73,6 @@ expressApp.use((err, req, res, next) => {
   return res
     .status(404)
     .send({ errors: [err.message || 'Endpoint not found'] });
-});
-
-expressApp.use((_, res, next) => {
-  res.status(404).send({ errors: ['Endpoint not found'] });
 });
 
 export default expressApp;
